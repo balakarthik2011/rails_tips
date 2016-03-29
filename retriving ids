@@ -1,0 +1,29 @@
+Retriving the ids of the has_many or has_many_through relationships
+For example,
+You have two models post and comments
+
+post has many comments
+
+comments belongs to post
+
+if you want to retrive the ids of the comment of a particular post.
+
+you can use,
+
+Post.find(id).comment_ids
+
+This is efficient when compared to using functions like map,pluck.
+
+>> Post.first.comments.map(&:id)
+  Post Load (1.0ms)  SELECT  "posts".* FROM "posts"  ORDER BY "posts"."id" ASC LIMIT 1
+  Comment Load (3.0ms)  SELECT "comments".* FROM "comments" WHERE "comments"."post_id" = $1  [["post_id", 1]]
+[1,4,6]
+>> Post.first.comments.pluck(:id)
+  Post Load (1.5ms)  SELECT  "posts".* FROM "posts"  ORDER BY "posts"."id" ASC LIMIT 1
+   (1.2ms)  SELECT "comments"."id" FROM "comments" WHERE "comments"."post_id" = $1  [["post_id", 1]]
+[1,4,6]
+
+ Post.first.comment_ids
+  Post Load (1.0ms)  SELECT  "posts".* FROM "posts"  ORDER BY "posts"."id" ASC LIMIT 1
+   (1.0ms)  SELECT "comments".id FROM "comments" WHERE "comments"."post_id" = $1  [["post_id", 1]]
+[1,4,6]
